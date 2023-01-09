@@ -11,16 +11,21 @@ interface IBleSdkCallback {
 //    fun onSportModelStateChange(var1: SportModelStateData?)
 //    fun onReadOriginProgress(progress: Float)
     fun onHeartDataChange(heartData: HeartData)
-
-    //    fun onCameraDataChange(operateStatus: ECameraStatus)
-//    fun onHeartWaringDataChange(heartWaringData: HeartWaringData)
-    fun onSportDataChange(sportData: SportData)
-
-    //    fun onPwdDataChange(pwd: PwdData)
     fun onTmpDataChange(tmpDetectData: TemptureDetectData)
     fun onVerificationpwData(pwdData: PwdData)
     fun onVerificationFuntionSupport(functionDeviceSupportData: FunctionDeviceSupportData)
     fun onSyncProfile()
+    fun onSportDataChange(sportData: SportData)
+    fun onResponse(state: Int)
+    fun onWeatherDataChange(weatherStatusData: WeatherStatusData)
+    fun onUpdateAGPS(bigTranType: Int, isSupportAgps: Boolean)
+    fun onLowerPowerDataDataChange(lowPowerData: LowPowerData)
+    fun onDataChange(bpFunctionData: BpFunctionData)
+
+    //    fun onCameraDataChange(operateStatus: ECameraStatus)
+//    fun onHeartWaringDataChange(heartWaringData: HeartWaringData)
+    //    fun onPwdDataChange(pwd: PwdData)
+
 //    fun onSportStopped()
 //    fun onStartDetectHeart()
 

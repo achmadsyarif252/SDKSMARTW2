@@ -3,33 +3,25 @@ package com.example.blesdktest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Message
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.blesdktest.datastring.Oprate.Companion.SPORT_MODE_START_INDOOR
-import com.example.blesdktest.datastring.Oprate.Companion.oprateStr
 import com.example.blesdktest.adapter.GridAdapter
 import com.example.blesdktest.databinding.ActivityFiturTestBinding
-import com.example.blesdktest.smartwatch.WriteResponse
-import com.example.blesdktest.ui.HeartRateActivity
-import com.example.blesdktest.ui.SportDataActivity
-import com.example.blesdktest.ui.SuhuActivity
+import com.example.blesdktest.datastring.Oprate.Companion.SPORT_MODE_START_INDOOR
+import com.example.blesdktest.datastring.Oprate.Companion.oprateStr
+import com.example.blesdktest.ui.*
 import com.example.blesdktest.viewModel.SmartWViewModel
 import com.orhanobut.logger.Logger
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
-import com.veepoo.protocol.listener.data.ISocialMsgDataListener
 import com.veepoo.protocol.listener.data.ISportModelStateListener
-import com.veepoo.protocol.model.datas.FunctionSocailMsgData
-import com.veepoo.protocol.model.datas.PersonInfoData
+import com.veepoo.protocol.model.datas.PwdData
 import com.veepoo.protocol.model.datas.SportModelStateData
 import com.veepoo.protocol.model.enums.EBPDetectModel
-import com.veepoo.protocol.model.enums.EFunctionStatus
-import com.veepoo.protocol.model.enums.ESex
 import com.veepoo.protocol.model.enums.ESportType
 
 class TestingFeature : AppCompatActivity() {
@@ -38,6 +30,7 @@ class TestingFeature : AppCompatActivity() {
     private lateinit var deviceaddress: String
     var mGridData = ArrayList<String>()
     var mContext: Context = this@TestingFeature
+    private lateinit var pwdData: PwdData
 
     private lateinit var smartWViewModel: SmartWViewModel
 
@@ -52,17 +45,6 @@ class TestingFeature : AppCompatActivity() {
     /**
      * Password verification to obtain the following information
      */
-    var watchDataDay = 3
-    var weatherStyle = 0
-    var contactMsgLength = 0
-    var allMsgLenght = 4
-    private var deviceNumber = -1
-    private var deviceVersion: String? = null
-    private var deviceTestVersion: String? = null
-    var isOadModel = false
-    var isNewSportCalc = false
-    var isInPttModel = false
-
 
     private fun sendMsg(message: String, what: Int) {
         AlertDialog.Builder(this).apply {
@@ -87,14 +69,22 @@ class TestingFeature : AppCompatActivity() {
         deviceaddress = intent.getStringExtra("deviceaddress").toString()
         initGridView()
         initViewModel()
-
-
     }
+
 
     private fun initViewModel() {
         smartWViewModel = ViewModelProvider(this)[SmartWViewModel::class.java]
         smartWViewModel.verification()
         smartWViewModel.syncProfile()
+        smartWViewModel.pwdData.observe(this) {
+            pwdData.deviceNumber = it.deviceNumber
+            pwdData.deviceTestVersion = it.deviceTestVersion
+            pwdData.deviceVersion = it.deviceVersion
+            pwdData.isHaveDrinkData = it.isHaveDrinkData
+            pwdData.findPhoneFunction = it.findPhoneFunction
+            pwdData.isOpenNightTurnWriste = it.isOpenNightTurnWriste
+            pwdData.wearDetectFunction = it.wearDetectFunction
+        }
     }
 
     private fun initGridView() {
@@ -117,26 +107,158 @@ class TestingFeature : AppCompatActivity() {
 
     }
 
+
     private fun onClicked(i: Int) {
         when (i) {
-            7 -> {
-                startActivity(Intent(this@TestingFeature, HeartRateActivity::class.java))
-            }
-            9 -> {
-                startActivity(Intent(this@TestingFeature, SuhuActivity::class.java))
-            }
-            11 -> {
-                VPOperateManager.getMangerInstance(mContext).stopDetectTempture(
-                    writeResponse
-                ) { temptureDetectData ->
-                    val message = "stopDetectTempture temptureDetectData:\n$temptureDetectData"
+            7 -> startActivity(Intent(this@TestingFeature, HeartRateActivity::class.java))
+            9 -> startActivity(Intent(this@TestingFeature, SuhuActivity::class.java))
+            10 -> {
+                smartWViewModel.stopCekTemp()
+                smartWViewModel.tmpData.observe(this) {
                     Toast.makeText(
                         this@TestingFeature,
-                        "Temperature stop :$message",
+                        "Temperature Check Stop,Current Temp : $it",
                         Toast.LENGTH_SHORT
                     ).show()
-                    Logger.t(TAG).i(message)
-                    sendMsg(message, 1)
+                }
+            }
+            83 -> {
+                smartWViewModel.setWatchTime()
+                smartWViewModel.onResponseState.observe(this) {
+                    Toast.makeText(
+                        this@TestingFeature,
+                        "Watch Time State : $it",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            96 -> {
+                startActivity(Intent(this@TestingFeature, EcgDetectActivity::class.java))
+            }
+
+            99 -> {
+                smartWViewModel.readLowPowerData()
+                smartWViewModel.lowPowerData.observe(this) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(getString(R.string.app_name))
+                        setMessage(it.toString())
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+            100 -> {
+                smartWViewModel.settingLowPower()
+                smartWViewModel.lowPowerData.observe(this) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(getString(R.string.app_name))
+                        setMessage(it.toString())
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+            101 -> {
+                smartWViewModel.closeLowPower()
+                smartWViewModel.lowPowerData.observe(this) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(getString(R.string.app_name))
+                        setMessage(it.toString())
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+//            106 -> {
+//                val intent = Intent(this@TestingFeature, PttActivity::class.java)
+//                intent.putExtra("inPttModel", isInPttModel)
+//                startActivity(intent)
+//            }
+
+            107 -> {
+                smartWViewModel.bpFunctionData()
+                smartWViewModel.BpFunctionData.observe(this) {
+                    val message = """
+                        readBpFunctionState close:
+                        ${it.toString()}
+                        """.trimIndent()
+                    AlertDialog.Builder(this).apply {
+                        setTitle("BloodPressure Function Data")
+                        setMessage(message)
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+            109 -> {
+                smartWViewModel.readWeather()
+                smartWViewModel.msgWeatherData.observe(this) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(getString(R.string.app_name))
+                        setMessage(it)
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+            110 -> {
+                smartWViewModel.settingWeatherData()
+                smartWViewModel.msgWeatherDataSetting.observe(this) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(getString(R.string.app_name))
+                        setMessage(it)
+                        setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        create()
+                        show()
+                    }
+                }
+            }
+
+            115 -> {
+                smartWViewModel.onUpdateUIAGPS()
+                var bigTranType = 0
+                var isSupportAgps = false
+                smartWViewModel.bigTranType.observe(this) {
+                    bigTranType = it
+                }
+                smartWViewModel.isSupportAgps.observe(this) {
+                    isSupportAgps = it
+                }
+                if (bigTranType == 2 && isSupportAgps) {
+                    val intent = Intent(this@TestingFeature, UIUpdateAPGSActivity::class.java)
+                    intent.putExtra("deviceNumber", pwdData.deviceNumber.toString())
+                    intent.putExtra("deviceVersion", pwdData.deviceVersion)
+                    intent.putExtra("deviceTestVersion", pwdData.deviceTestVersion)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(
+                        mContext,
+                        "Tidak mendukung tampilan jam kustom",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
             12 -> {
@@ -162,7 +284,7 @@ class TestingFeature : AppCompatActivity() {
                     .startMultSportModel(writeResponse, object : ISportModelStateListener {
                         override fun onSportModelStateChange(sportModelStateData: SportModelStateData) {
                             val message = "indoor walk$sportModelStateData"
-                            Toast.makeText(this@TestingFeature, "$message", Toast.LENGTH_SHORT)
+                            Toast.makeText(this@TestingFeature, message, Toast.LENGTH_SHORT)
                                 .show()
                             Logger.t(TAG).i(message)
                         }

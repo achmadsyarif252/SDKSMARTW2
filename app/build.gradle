@@ -11,6 +11,7 @@ android {
         viewBinding true
     }
 
+
     defaultConfig {
         applicationId "com.example.blesdktest"
         minSdk 21

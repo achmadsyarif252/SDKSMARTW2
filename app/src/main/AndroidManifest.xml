@@ -25,6 +25,13 @@
         android:theme="@style/Theme.BleSDkTest"
         tools:targetApi="31">
         <activity
+            android:name=".ui.UIUpdateAPGSActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".TestingFeature"
             android:exported="false">
             <meta-data
@@ -40,6 +47,13 @@
         </activity>
         <activity
             android:name=".ui.HeartRateActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.EcgDetectActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
