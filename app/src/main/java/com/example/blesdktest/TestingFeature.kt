@@ -8,14 +8,17 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.blesdktest.Oprate.Companion.SPORT_MODE_START_INDOOR
-import com.example.blesdktest.Oprate.Companion.oprateStr
+import com.example.blesdktest.datastring.Oprate.Companion.SPORT_MODE_START_INDOOR
+import com.example.blesdktest.datastring.Oprate.Companion.oprateStr
 import com.example.blesdktest.adapter.GridAdapter
 import com.example.blesdktest.databinding.ActivityFiturTestBinding
+import com.example.blesdktest.smartwatch.WriteResponse
 import com.example.blesdktest.ui.HeartRateActivity
 import com.example.blesdktest.ui.SportDataActivity
 import com.example.blesdktest.ui.SuhuActivity
+import com.example.blesdktest.viewModel.SmartWViewModel
 import com.orhanobut.logger.Logger
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
@@ -35,11 +38,10 @@ class TestingFeature : AppCompatActivity() {
     private lateinit var deviceaddress: String
     var mGridData = ArrayList<String>()
     var mContext: Context = this@TestingFeature
-    var isSleepPrecision = false
-    var msg: Message? = null
 
+    private lateinit var smartWViewModel: SmartWViewModel
 
-    var writeResponse: WriteResponse = WriteResponse()
+    private var writeResponse: WriteResponse = WriteResponse()
 
     class WriteResponse : IBleWriteResponse {
         override fun onResponse(code: Int) {
@@ -61,19 +63,6 @@ class TestingFeature : AppCompatActivity() {
     var isNewSportCalc = false
     var isInPttModel = false
 
-    var socialMsgDataListener: ISocialMsgDataListener = object : ISocialMsgDataListener {
-        override fun onSocialMsgSupportDataChange(socailMsgData: FunctionSocailMsgData) {
-            val message = "FunctionSocailMsgData:\n$socailMsgData"
-            Logger.t(TAG).i(message)
-            sendMsg(message, 3)
-        }
-
-        override fun onSocialMsgSupportDataChange2(socailMsgData: FunctionSocailMsgData) {
-            val message = "FunctionSocailMsgData2:\n$socailMsgData"
-            Log.i(TAG, message)
-            sendMsg(message, 3)
-        }
-    }
 
     private fun sendMsg(message: String, what: Int) {
         AlertDialog.Builder(this).apply {
@@ -97,8 +86,15 @@ class TestingFeature : AppCompatActivity() {
         mContext = applicationContext
         deviceaddress = intent.getStringExtra("deviceaddress").toString()
         initGridView()
+        initViewModel()
 
 
+    }
+
+    private fun initViewModel() {
+        smartWViewModel = ViewModelProvider(this)[SmartWViewModel::class.java]
+        smartWViewModel.verification()
+        smartWViewModel.syncProfile()
     }
 
     private fun initGridView() {
@@ -121,54 +117,8 @@ class TestingFeature : AppCompatActivity() {
 
     }
 
-
     private fun onClicked(i: Int) {
         when (i) {
-            0 -> {
-                val is24Hourmodel = false
-                VPOperateManager.getMangerInstance(mContext).confirmDevicePwd(writeResponse,
-                    { pwdData ->
-                        val message = "PwdData:\n$pwdData"
-                        Logger.t(TAG).i(message)
-                        //                    sendMsg(message, 1);
-                        deviceNumber = pwdData.deviceNumber
-                        deviceVersion = pwdData.deviceVersion
-                        deviceTestVersion = pwdData.deviceTestVersion
-                        Toast.makeText(
-                            this@TestingFeature,
-                            "Device No：$deviceNumber,version number：$deviceVersion,\ntest version number：$deviceTestVersion",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }, { functionSupport ->
-                        val message = "FunctionDeviceSupportData:\n$functionSupport"
-                        Logger.t(TAG).i(message)
-                        //                    sendMsg(message, 2);
-                        val newCalcSport = functionSupport.newCalcSport
-                        isNewSportCalc =
-                            newCalcSport != null && newCalcSport == EFunctionStatus.SUPPORT
-                        watchDataDay = functionSupport.wathcDay
-                        weatherStyle = functionSupport.weatherStyle
-                        contactMsgLength = functionSupport.contactMsgLength
-                        allMsgLenght = functionSupport.allMsgLength
-                        isSleepPrecision = functionSupport.precisionSleep == EFunctionStatus.SUPPORT
-                    }, socialMsgDataListener,
-                    { customSettingData ->
-                        val message = "CustomSettingData:\n$customSettingData"
-                        Logger.t(TAG).i(message)
-                        //                    sendMsg(message, 4);
-                    }, "0000", is24Hourmodel
-                )
-            }
-            1 -> {
-                VPOperateManager.getMangerInstance(mContext).syncPersonInfo(
-                    writeResponse,
-                    { EOprateStauts ->
-                        val message = "Synchronize personal information:\n$EOprateStauts"
-                        Logger.t(TAG).i(message)
-                        sendMsg(message, 1)
-                    }, PersonInfoData(ESex.MAN, 178, 60, 20, 8000)
-                )
-            }
             7 -> {
                 startActivity(Intent(this@TestingFeature, HeartRateActivity::class.java))
             }

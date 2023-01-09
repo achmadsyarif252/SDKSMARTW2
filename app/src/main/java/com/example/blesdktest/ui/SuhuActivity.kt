@@ -10,7 +10,6 @@ import com.example.blesdktest.smartwatch.WriteResponse
 class SuhuActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySuhuBinding
     private lateinit var smartWViewModel: SmartWViewModel
-
     var writeResponse: WriteResponse = WriteResponse()
 
     override fun onCreate(savedInstanceState: Bundle?) {

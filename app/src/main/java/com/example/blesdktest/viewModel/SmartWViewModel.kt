@@ -17,6 +17,12 @@ class SmartWViewModel : ViewModel() {
     private var _tempData = MutableLiveData<Float>()
     val tmpData: LiveData<Float> = _tempData
 
+    private val _pwData = MutableLiveData<PwdData>()
+    val pwdData: LiveData<PwdData> = _pwData
+
+    private val _functionSupportData = MutableLiveData<FunctionDeviceSupportData>()
+    val functioinSupportData: LiveData<FunctionDeviceSupportData> = _functionSupportData
+
 
     fun cekTmp() {
         swi.checkTemp()
@@ -30,6 +36,14 @@ class SmartWViewModel : ViewModel() {
         swi.readStep()
     }
 
+    fun verification() {
+        swi.verification()
+    }
+
+    fun syncProfile() {
+        swi.syncProfile()
+    }
+
     private val swi = SmartWImp(object : IBleSdkCallback {
         override fun onHeartDataChange(heartData: HeartData) {
             _heartRate.value = heartData
@@ -41,6 +55,18 @@ class SmartWViewModel : ViewModel() {
 
         override fun onTmpDataChange(tmpDetectData: TemptureDetectData) {
             _tempData.value = tmpDetectData.tempture
+        }
+
+        override fun onVerificationpwData(pwdData: PwdData) {
+            _pwData.value = pwdData
+        }
+
+        override fun onVerificationFuntionSupport(functionDeviceSupportData: FunctionDeviceSupportData) {
+            _functionSupportData.value = functionDeviceSupportData
+        }
+
+        override fun onSyncProfile() {
+
         }
 
     })
