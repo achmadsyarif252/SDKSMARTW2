@@ -10,9 +10,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
+import com.goodix.ble.libcomx.annotation.NonNull;
+import com.goodix.ble.libcomx.annotation.Nullable;
 import com.orhanobut.logger.Logger;
 import com.example.blesdktest.R;
 
@@ -222,7 +221,7 @@ public class EcgHeartRealthView extends View {
         this.item_contents = item_content;
         linePositionX = linePositionX % rowEcgCount;
         for (int i = linePositionX; i < linePositionX + item_contents; i++) {
-            if (i >= rowEcgCount) {
+            if (i  >= rowEcgCount) {
                 linePositionX = -item_content;
                 break;
             }

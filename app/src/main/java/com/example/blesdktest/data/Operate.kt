@@ -1,4 +1,4 @@
-package com.example.blesdktest.datastring
+package com.example.blesdktest.data
 
 interface Oprate {
     companion object {

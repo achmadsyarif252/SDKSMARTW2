@@ -12,10 +12,7 @@ class HeartRateActivity() :
     AppCompatActivity() {
     private lateinit var binding: ActivityHeartRateBinding
     private lateinit var smartWViewModel: SmartWViewModel
-
     var writeResponse: WriteResponse = WriteResponse()
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHeartRateBinding.inflate(layoutInflater)

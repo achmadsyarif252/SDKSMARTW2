@@ -25,6 +25,27 @@
         android:theme="@style/Theme.BleSDkTest"
         tools:targetApi="31">
         <activity
+            android:name=".ui.BloodPressureActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.PttActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.HBandECG"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.UIUpdateAPGSActivity"
             android:exported="false">
             <meta-data

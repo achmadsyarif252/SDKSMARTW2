@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
+import com.example.blesdktest.R
 import com.example.blesdktest.viewModel.SmartWViewModel
 import com.example.blesdktest.databinding.ActivitySportDataBinding
 import com.veepoo.protocol.VPOperateManager
@@ -22,7 +23,7 @@ class SportDataActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.refresh.setOnClickListener {
-
+            smartWViewModel.cekStep()
         }
         setUpViewModel()
     }
@@ -39,16 +40,13 @@ class SportDataActivity : AppCompatActivity() {
     }
 
     private fun showSportData(sportData: SportData) {
-        binding.data1.text = "Total langkah : " + sportData.step.toString()
-        binding.data2.text = "Total kalori terbakar :" + sportData.kcal.toString() + "Kcal"
-        binding.data3.text = "Jarak : " + sportData.dis.toString()
+        binding.data1.text = getString(R.string.total_steps, sportData.step.toString())
+        binding.data2.text = getString(R.string.cal_total, sportData.kcal.toString())
+        binding.data3.text = getString(R.string.distance, sportData.dis.toString())
         binding.data4.text = sportData.calcType.toString()
         binding.data5.text = sportData.triaxialX.toString()
         binding.data6.text = sportData.triaxialY.toString()
         binding.data7.text = sportData.triaxialZ.toString()
     }
 
-    companion object {
-        private val TAG = SportDataActivity::class.java.simpleName
-    }
 }

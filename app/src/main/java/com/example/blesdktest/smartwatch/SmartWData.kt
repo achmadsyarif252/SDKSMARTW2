@@ -1,5 +1,7 @@
 package com.example.blesdktest.smartwatch
 
+import com.veepoo.protocol.model.enums.ECameraStatus
+
 interface SmartWData {
     fun checkHeartRate()
     fun checkTemp()
@@ -15,4 +17,40 @@ interface SmartWData {
     fun settingLowPower()
     fun closeLowPower()
     fun readBloodPFunction()
+    fun startDetectBP()
+    fun stopDetectBP()
+    fun settingDetectBP()
+    fun stopDetectHR()
+    fun startCamera()
+    fun stopCamera()
+    fun settingAlarm()
+    fun getBatteryLevel()
+    fun disconnect()
+    fun findPhone()
+    fun settingCheckWear(status: Boolean)
+    fun settingFindDevice(status: Boolean)
+    fun readFindDevice()
+    fun clearDeviceData()
+    fun readHeartWarning()
+    fun settingHeartWarning(status: Boolean)
+    fun startDetectSPO2H()
+    fun stopDetectSPO2H()
+    fun readSpo2hAutoDetect()
+    fun settingSpo2hAutoDetect(open: Int)
+    fun startMulSportMode()
+    fun startSportModel()
+    fun readSportModelOrigin()
+    fun readSportModelState()
+    fun readSpo2hOrigin()
+    fun startDetectFatigue()
+    fun stopDetectFatigue()
+    fun settingWomenState()
+    fun readWomenState()
+    fun readChantingData()
+    fun readTemptureDataBySetting()
+    fun readSleepData()
+    fun readSleepDataFromDay()
+    fun readSleepDataSingleDay()
+    fun readDrinkData()
+
 }

@@ -6,8 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.Nullable;
-
+import com.goodix.ble.libcomx.annotation.Nullable;
 import com.orhanobut.logger.Logger;
 import com.example.blesdktest.R;
 import com.veepoo.protocol.VPOperateManager;
@@ -82,7 +81,7 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
     }
 
     /**
-     * 写入的状态返回
+     * The status of the write is returned
      */
     class WriteResponse implements IBleWriteResponse {
 

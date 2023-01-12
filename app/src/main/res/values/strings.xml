@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">BleSDk Test</string>
+    <string name="bpStatus">Status %1$s</string>
+    <string name="bpProgress">Progress : %1$d</string>
+    <string name="lp">Tekanan Rendah : %1$d</string>
+    <string name="hp">Tekanan Tinggi : %1$d</string>
+    <string name="isProgress">Berprogres : %1$s</string>
+    <string name="total_steps">Total langkah :  %1$s</string>
+    <string name="cal_total">Total kalori terbakar : %1$s</string>
+    <string name="distance">"Jarak : %1$s"</string>
+
 </resources>
