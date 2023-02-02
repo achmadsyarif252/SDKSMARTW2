@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@android:color/black">
+        android:background="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -26,19 +30,133 @@
         android:layout_marginRight="20dp"
         android:gravity="center"
         android:text="Harap lakukan verifikasi kata sandi dan sinkronkan operasi informasi pribadi"
-        android:textColor="@color/purple_200" />
+        android:textColor="@color/purple_200"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@id/main_gridview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_title_ble">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/hrValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Heart Rate : Loading...."
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/spo2Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SPO2 : Loading...."
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/bateryLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Level Baterai"
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/temperatureBase"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Suhu Ruangan : Loading..."
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/temperatueSkin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Suhu Kulit : Loading..."
+                android:textColor="@color/purple_500" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Sport Data"
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/step"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Step "
+                android:textColor="@color/purple_500" />
+
+
+            <TextView
+                android:id="@+id/kalori"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Kalori "
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/jarak"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Jarak"
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/bpHigh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="High Pressure : Loading..."
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/bpLow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Low Pressure : Loading..."
+                android:textColor="@color/purple_500" />
+
+            <TextView
+                android:id="@+id/bpStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Blood Pressure Status : Loading..."
+                android:textColor="@color/purple_500" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="12dp"
         android:id="@+id/main_gridview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="400dp"
+        android:layout_marginTop="12dp"
         android:horizontalSpacing="1.0px"
         android:listSelector="@null"
         android:numColumns="3"
         android:smoothScrollbar="true"
         android:soundEffectsEnabled="true"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="1.0px" />
+        android:verticalSpacing="1.0px"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

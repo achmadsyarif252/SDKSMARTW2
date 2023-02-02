@@ -23,7 +23,7 @@ class SportDataActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.refresh.setOnClickListener {
-            smartWViewModel.cekStep()
+            smartWViewModel.startReadSportData()
         }
         setUpViewModel()
     }
@@ -34,7 +34,7 @@ class SportDataActivity : AppCompatActivity() {
         smartWViewModel.sportData.observe(this) {
             showSportData(it)
         }
-        smartWViewModel.cekStep()
+        smartWViewModel.startReadSportData()
 
 
     }

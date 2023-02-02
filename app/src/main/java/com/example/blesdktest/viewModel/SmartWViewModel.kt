@@ -16,8 +16,8 @@ class SmartWViewModel : ViewModel() {
     private var _heartRate = MutableLiveData<HeartData>()
     val heartRate: LiveData<HeartData> = _heartRate
 
-    private var _tempData = MutableLiveData<Float>()
-    val tmpData: LiveData<Float> = _tempData
+    private var _tempData = MutableLiveData<TemptureDetectData>()
+    val tmpData: LiveData<TemptureDetectData> = _tempData
 
     private var _pwData = MutableLiveData<PwdData>()
     val pwdData: LiveData<PwdData> = _pwData
@@ -134,7 +134,7 @@ class SmartWViewModel : ViewModel() {
     val drinkData: LiveData<DrinkData> = _drinkData
 
 
-    fun cekTmp() {
+    fun startDetectTemp() {
         swi.checkTemp()
     }
 
@@ -142,11 +142,11 @@ class SmartWViewModel : ViewModel() {
         swi.stopCheckTemp()
     }
 
-    fun checkHr() {
+    fun startDetectHR() {
         swi.checkHeartRate()
     }
 
-    fun cekStep() {
+    fun startReadSportData() {
         swi.readStep()
     }
 
@@ -562,7 +562,7 @@ class SmartWViewModel : ViewModel() {
 
 
         override fun onTmpDataChange(tmpDetectData: TemptureDetectData) {
-            _tempData.postValue(tmpDetectData.tempture)
+            _tempData.postValue(tmpDetectData)
         }
 
         override fun onVerificationpwData(pwdData: PwdData) {

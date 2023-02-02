@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.blesdktest.adapter.GridAdapter
 import com.example.blesdktest.databinding.ActivityFiturTestBinding
@@ -22,6 +23,11 @@ import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.model.datas.*
 import com.veepoo.protocol.model.enums.EBPDetectModel
+import com.veepoo.protocol.model.enums.EHeartStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class TestingFeature : AppCompatActivity() {
@@ -69,6 +75,52 @@ class TestingFeature : AppCompatActivity() {
         deviceaddress = intent.getStringExtra("deviceaddress").toString()
         initGridView()
         initViewModel()
+        initDataSDK()
+    }
+
+    private fun initDataSDK() {
+        //prepare device for reading data from SDK
+        lifecycleScope.launch {
+            delay(1000)
+            smartWViewModel.startDetectTemp()
+        }
+        smartWViewModel.heartRate.observe(this)
+        {
+            if (it.data != 0 && it.data != 1) {
+                binding.hrValue.text = "Heart Rate : ${it.data} BPM"
+                smartWViewModel.stopDetectHR()
+                smartWViewModel.settingSpo2hAutoDetect(1)
+                smartWViewModel.readSpo2hAutoDetect()
+                smartWViewModel.startDetectSPO2H()
+            } else {
+                binding.hrValue.text =
+                    "Heart Rate : Loading... Status Device = ${it.heartStatus}"
+            }
+        }
+
+        smartWViewModel.spo2hData.observe(this) {
+            Log.d(
+                "SPO2 Value ",
+                "initDataSDK: ${it.value} Checking Progress = ${it.checkingProgress} State Device = ${it.deviceState}"
+            )
+            if (it.value != 0) {
+                binding.spo2Value.text = "SPO2 : ${it.value}%"
+                smartWViewModel.stopDetectSPO2H()
+                smartWViewModel.startDetectBP()
+            } else {
+                binding.spo2Value.text =
+                    "SPO2 : Loading..."
+            }
+        }
+
+        smartWViewModel.bpData.observe(this) {
+            if (it.progress == 100) {
+                binding.bpHigh.text = "High Pressure = ${it.highPressure}"
+                binding.bpLow.text = "Low Pressure = ${it.lowPressure}"
+                binding.bpStatus.text = "Blood Pressure Status = ${it.status}"
+                smartWViewModel.stopDetectBP()
+            }
+        }
     }
 
 
@@ -86,6 +138,22 @@ class TestingFeature : AppCompatActivity() {
             pwdData.wearDetectFunction = it.wearDetectFunction
         }
         smartWViewModel.getBateryLevel()
+        smartWViewModel.batteryData.observe(this) {
+            binding.bateryLevel.text =
+                "Baterai Sisa = ${it.batteryLevel} Persentase = ${it.batteryLevel * 25}%"
+        }
+
+        smartWViewModel.tmpData.observe(this) {
+            binding.temperatureBase.text = "Suhu Ruangan = ${it.temptureBase}"
+            binding.temperatueSkin.text = "Suhu Kulit = ${it.tempture}"
+            if (it != null) smartWViewModel.startDetectHR()
+        }
+        smartWViewModel.startReadSportData()
+        smartWViewModel.sportData.observe(this) {
+            binding.step.text = "Total Step = ${it.step}"
+            binding.kalori.text = "Total Calories = ${it.kcal} KCal"
+            binding.jarak.text = "Total Distance = ${it.dis} KM"
+        }
     }
 
     private fun initGridView() {
@@ -809,7 +877,7 @@ class TestingFeature : AppCompatActivity() {
     }
 
 
-    //mulai
+//mulai
 
 
     companion object {

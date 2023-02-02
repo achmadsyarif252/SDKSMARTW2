@@ -27,7 +27,7 @@ class HeartRateActivity() :
         smartWViewModel.heartRate.observe(this) {
             showHeartRate(it)
         }
-        smartWViewModel.checkHr()
+        smartWViewModel.startDetectHR()
     }
 
     private fun showHeartRate(heartData: HeartData?) {

@@ -23,9 +23,9 @@ class SuhuActivity : AppCompatActivity() {
     private fun setupViewModel() {
         smartWViewModel = ViewModelProvider(this)[SmartWViewModel::class.java]
         smartWViewModel.tmpData.observe(this) {
-            showTemp(it)
+            showTemp(it.tempture)
         }
-        smartWViewModel.cekTmp()
+        smartWViewModel.startDetectTemp()
     }
 
     private fun showTemp(tmp: Float?) {

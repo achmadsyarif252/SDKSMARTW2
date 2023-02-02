@@ -161,8 +161,10 @@ class MainActivity : AppCompatActivity() {
             override fun onItemClicked(searchResult: SearchResult) {
                 Toast.makeText(this@MainActivity, "Connecting,please wait..", Toast.LENGTH_SHORT)
                     .show()
-                connectDevice(searchResult.address, searchResult.name);
+//                connectDevice(searchResult.address, searchResult.name);
+            connectDevice("C3:30:04:34:05:F5","E400")
             }
+
 
         })
         binding.rvBluetooth.adapter = adapter
