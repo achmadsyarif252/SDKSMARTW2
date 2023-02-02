@@ -53,4 +53,6 @@ interface SmartWData {
     fun readSleepDataSingleDay()
     fun readDrinkData()
 
+    fun readHRVOrigin()
+
 }

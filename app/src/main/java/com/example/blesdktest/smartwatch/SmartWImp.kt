@@ -1,6 +1,7 @@
 package com.example.blesdktest.smartwatch
 
 import android.util.Log
+import com.example.blesdktest.TestingFeature
 import com.example.blesdktest.data.Oprate.Companion.SPORT_MODE_ORIGIN_READSTAUTS
 import com.example.blesdktest.data.Oprate.Companion.SPORT_MODE_START_INDOOR
 import com.orhanobut.logger.Logger
@@ -177,6 +178,7 @@ class SmartWImp(private val callback: IBleSdkCallback) : SmartWData {
                 callback.onDataChange(bpData)
             }, EBPDetectModel.DETECT_MODEL_PUBLIC
         )
+
     }
 
     override fun stopDetectBP() {
@@ -663,6 +665,39 @@ class SmartWImp(private val callback: IBleSdkCallback) : SmartWData {
                     Logger.t(TAG).i(message)
                 }
             })
+    }
+
+    override fun readHRVOrigin() {
+        Log.d("HRV Origin Data", "dipanggil di SmartWImp")
+        VPOperateManager.getMangerInstance(mContext)
+            .readHRVOrigin(writeResponse, object : IHRVOriginDataListener {
+                override fun onReadOriginProgress(progress: Float) {
+                    Log.d("HRV Origin Data", "onReadOriginProgress =$progress")
+                }
+
+                override fun onReadOriginProgressDetail(
+                    day: Int,
+                    date: String,
+                    allPackage: Int,
+                    currentPackage: Int
+                ) {
+                    Log.d(
+                        "HRV Origin Data",
+                        "onReadOriginProgressDetail,day=$day,date=$date,allPackage=$allPackage,currentPackage=$currentPackage"
+                    )
+                }
+
+                override fun onHRVOriginListener(hrvOriginData: HRVOriginData) {
+                    Log.d("HRV Origin Data", "onHRVOriginListener=$hrvOriginData")
+                }
+
+                override fun onDayHrvScore(day: Int, date: String, hrvSocre: Int) {
+                    Log.d("HRV Origin Data", "dipanggil di dalam VPOPERATOR MANAGERRRR")
+                }
+                override fun onReadOriginComplete() {
+                    Log.d("HRV Origin Data", "onReadOriginComplete")
+                }
+            }, watchDataDay)
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.blesdktest.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -326,6 +327,11 @@ class SmartWViewModel : ViewModel() {
 
     fun readDrinkData() {
         swi.readDrinkData()
+    }
+
+    fun readHRVOrigin() {
+        swi.readHRVOrigin()
+        Log.d("HRV Origin Data", "readHRVOrigin: dipangilllll")
     }
 
     private val swi = SmartWImp(object : IBleSdkCallback {

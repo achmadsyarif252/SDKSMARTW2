@@ -11,23 +11,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.blesdktest.adapter.GridAdapter
-import com.example.blesdktest.databinding.ActivityFiturTestBinding
 import com.example.blesdktest.data.Oprate.Companion.SPORT_MODE_ORIGIN_READSTAUTS
 import com.example.blesdktest.data.Oprate.Companion.oprateStr
+import com.example.blesdktest.databinding.ActivityFiturTestBinding
 import com.example.blesdktest.model.BPData
 import com.example.blesdktest.smartwatch.SmartWImp
+import com.example.blesdktest.smartwatch.SmartWImp.Companion.watchDataDay
 import com.example.blesdktest.ui.*
 import com.example.blesdktest.viewModel.SmartWViewModel
 import com.orhanobut.logger.Logger
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
+import com.veepoo.protocol.listener.data.*
 import com.veepoo.protocol.model.datas.*
 import com.veepoo.protocol.model.enums.EBPDetectModel
-import com.veepoo.protocol.model.enums.EHeartStatus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class TestingFeature : AppCompatActivity() {
@@ -37,6 +36,7 @@ class TestingFeature : AppCompatActivity() {
     var mGridData = ArrayList<String>()
     var mContext: Context = this@TestingFeature
     private lateinit var pwdData: PwdData
+    private var isInPttModel = false
 
     private lateinit var smartWViewModel: SmartWViewModel
 
@@ -73,10 +73,176 @@ class TestingFeature : AppCompatActivity() {
 
         mContext = applicationContext
         deviceaddress = intent.getStringExtra("deviceaddress").toString()
+        listenDeviceCallbackData()
+        listenCamera()
         initGridView()
         initViewModel()
         initDataSDK()
     }
+
+    private fun listenDeviceCallbackData() {
+        VPOperateManager.getMangerInstance(mContext)
+            .settingDeviceControlPhone(object : IDeviceControlPhoneModelState {
+                override fun inPttModel() {
+                    val message = "Peringatan arloji: arloji memasuki mode ptt"
+                    isInPttModel = true
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun outPttModel() {
+                    isInPttModel = false
+                    val message = "Peringatan arloji: Arloji keluar dari mode ptt"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun rejectPhone() {
+                    val message = "Perhatikan peringatan: Harap tutup panggilan Anda"
+                    Logger.t(TAG).i(message)
+                    sendMsg(message, 1)
+                }
+
+                override fun cliencePhone() {
+                    val message = "Peringatan jam tangan: Tolong panggil untuk diam"
+                    Logger.t(TAG).i(message)
+                    sendMsg(message, 1)
+                }
+
+                override fun knocknotify(type: Int) {
+                    val message =
+                        "Peringatan jam: Ketuk peringatan, 1 untuk klik, 2 untuk ketuk dua kali"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun sos() {
+                    val message = "Tips menonton: sos"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun nextMusic() {
+                    val message = "Peringatan jam tangan: Lagu berikutnya"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun previousMusic() {
+                    val message = "Kiat menonton:Lagu sebelumnya"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun pauseAndPlayMusic() {
+                    val message = "Peringatan jam tangan: jeda dan putar"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun pauseMusic() {
+                    val message = "Peringatan jam tangan: Jeda"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun playMusic() {
+                    val message = "Kiat menonton: Mainkan"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun voiceUp() {
+                    val message = "Kiat menonton: Naikkan volume"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun voiceDown() {
+                    val message = "手表提示:调低音量\n"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun oprateMusicSuccess() {
+                    val message = "手表提示:音乐相关的操作成功了\n"
+                    Logger.t(TAG).i(message)
+                }
+
+                override fun oprateMusicFail() {
+                    val message = "手表提示:音乐相关的操作失败了\n"
+                    Logger.t(TAG).i(message)
+                }
+            })
+    }
+
+    private fun listenCamera() {
+        VPOperateManager.getMangerInstance(mContext).setCameraListener { oprateStauts ->
+            Logger.t(
+                TAG
+            ).i("Camera oprateStauts:$oprateStauts")
+        }
+    }
+
+    private fun readOriginData() {
+        var originDataListener: IOriginProgressListener = object : IOriginDataListener {
+            override fun onReadOriginProgressDetail(
+                day: Int,
+                date: String,
+                allPackage: Int,
+                currentPackage: Int
+            ) {
+                val message =
+                    "健康数据[5分钟]-读取进度:currentPackage$currentPackage,allPackage=$allPackage,dates=$date,day=$day"
+                Logger.t(TAG).i(message)
+            }
+
+            override fun onReadOriginProgress(progress: Float) {}
+            override fun onReadOriginComplete() {}
+            override fun onOringinFiveMinuteDataChange(originData: OriginData) {}
+            override fun onOringinHalfHourDataChange(originHalfHourData: OriginHalfHourData) {}
+        }
+        val originData3Listener: IOriginProgressListener = object : IOriginData3Listener {
+            override fun onOriginFiveMinuteListDataChange(originDataList: List<OriginData3>) {
+                val message = "健康数据-返回:$originDataList"
+                Logger.t(TAG).i(message)
+            }
+
+            override fun onOriginHalfHourDataChange(originHalfHourDataList: OriginHalfHourData) {
+                val message = "健康数据[30分钟]-返回:$originHalfHourDataList"
+                Logger.t(TAG).i(message)
+                Logger.t(TAG)
+                    .i("健康数据[30分钟]-返回:30分钟的心率数据 size = " + originHalfHourDataList.halfHourRateDatas.size)
+                Logger.t(TAG)
+                    .i("健康数据[30分钟]-返回:30分钟的血压数据 size = " + originHalfHourDataList.halfHourBps.size)
+                Logger.t(TAG)
+                    .i("健康数据[30分钟]-返回:30分钟的运动数据 size = " + originHalfHourDataList.halfHourSportDatas.size)
+            }
+
+            override fun onOriginHRVOriginListDataChange(originHrvDataList: List<HRVOriginData>) {
+                val hrvOriginData = originHrvDataList[0]
+                val rate = hrvOriginData.getRate()
+            }
+
+            override fun onOriginSpo2OriginListDataChange(originSpo2hDataList: List<Spo2hOriginData>) {}
+            override fun onReadOriginProgress(progress: Float) {
+                val message = "onReadOriginProgress 健康数据[5分钟]-读取进度:$progress"
+                Logger.t(TAG).i(message)
+            }
+
+            override fun onReadOriginProgressDetail(
+                day: Int,
+                date: String,
+                allPackage: Int,
+                currentPackage: Int
+            ) {
+                val message =
+                    "onReadOriginProgressDetail 健康数据[5分钟]-读取进度:currentPackage=$currentPackage,allPackage=$allPackage,dates=$date,day=$day"
+                Logger.t(TAG).i(message)
+            }
+
+            override fun onReadOriginComplete() {
+                val message = "健康数据-读取结束"
+                Logger.t(TAG).i(message)
+            }
+        }
+        val protype = 3
+        if (protype == 3) {
+            originDataListener = originData3Listener
+        }
+        VPOperateManager.getMangerInstance(mContext)
+            .readOriginData(writeResponse, originDataListener, 3)
+    }
+
 
     private fun initDataSDK() {
         //prepare device for reading data from SDK
@@ -119,6 +285,7 @@ class TestingFeature : AppCompatActivity() {
                 binding.bpLow.text = "Low Pressure = ${it.lowPressure}"
                 binding.bpStatus.text = "Blood Pressure Status = ${it.status}"
                 smartWViewModel.stopDetectBP()
+                smartWViewModel.readHRVOrigin()
             }
         }
     }
@@ -523,6 +690,40 @@ class TestingFeature : AppCompatActivity() {
                 }
 
             }
+            93 -> {
+                VPOperateManager.getMangerInstance(mContext)
+                    .readHRVOrigin(writeResponse, object : IHRVOriginDataListener {
+                        override fun onReadOriginProgress(progress: Float) {
+                            Logger.t(TAG).i("onReadOriginProgress=$progress")
+
+                        }
+
+                        override fun onReadOriginProgressDetail(
+                            day: Int,
+                            date: String,
+                            allPackage: Int,
+                            currentPackage: Int
+                        ) {
+                            Logger.t(TAG)
+                                .i("onReadOriginProgressDetail,day=$day,date=$date,allPackage=$allPackage,currentPackage=$currentPackage")
+                        }
+
+                        override fun onHRVOriginListener(hrvOriginData: HRVOriginData) {
+                            Logger.t(TAG).i("onHRVOriginListener=$hrvOriginData")
+
+                        }
+
+                        override fun onDayHrvScore(day: Int, date: String, hrvSocre: Int) {
+                            Toast.makeText(this@TestingFeature, "Hallo", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onReadOriginComplete() {
+                            Logger.t(TAG).i("onReadOriginComplete")
+                            Toast.makeText(this@TestingFeature, "Hallo", Toast.LENGTH_SHORT).show()
+
+                        }
+                    }, watchDataDay)
+            }
             94 -> {
                 AlertDialog.Builder(this).apply {
                     setMessage("Hapus Data")
@@ -811,6 +1012,93 @@ class TestingFeature : AppCompatActivity() {
                 val message = "Drinking Data - End of Read"
                 Toast.makeText(this@TestingFeature, message, Toast.LENGTH_SHORT).show()
             }
+            80 -> {
+                var originDataListener: IOriginProgressListener? = object : IOriginDataListener {
+                    override fun onReadOriginProgressDetail(
+                        day: Int,
+                        date: String,
+                        allPackage: Int,
+                        currentPackage: Int
+                    ) {
+                        val message =
+                            "Data kesehatan [5 menit] - Kemajuan membaca:currentPackage$currentPackage,allPackage=$allPackage,dates=$date,day=$day"
+//                        Log.d("COBA TEST DI 80", message)
+                    }
+
+                    override fun onReadOriginProgress(progress: Float) {
+//                        Log.d("COBA TEST DI 80 Float", progress.toString())
+                    }
+
+                    override fun onReadOriginComplete() {
+//                        Log.d("COBA TEST DI 80", "KOMPLIT")
+                    }
+
+                    override fun onOringinFiveMinuteDataChange(originData: OriginData) {
+//                        Log.d("COBA TEST DI 80", originData.toString())
+                    }
+
+                    override fun onOringinHalfHourDataChange(originHalfHourData: OriginHalfHourData) {
+//                        Log.d("COBA TEST DI 80", originHalfHourData.toString())
+                    }
+                }
+                val originData3Listener: IOriginProgressListener = object : IOriginData3Listener {
+                    override fun onOriginFiveMinuteListDataChange(originDataList: List<OriginData3>) {
+                        val message = "Data kesehatan - pengembalian:$originDataList"
+//                        Log.d("COBA TEST DI 80", message)
+                    }
+
+                    override fun onOriginHalfHourDataChange(originHalfHourDataList: OriginHalfHourData) {
+                        val message = "Data kesehatan [30 menit] - Kembali:$originHalfHourDataList"
+//                        Log.d("COBA TEST DI 80", message)
+//                        Log.d(
+//                            "COBA TEST DI 80",
+//                            "Data kesehatan [30 menit] - kembali: data detak jantung selama 30 menit size = " + originHalfHourDataList.halfHourRateDatas.size
+//                        )
+//                        Log.d(
+//                            "COBA TEST DI 80",
+//                            "Data Kesehatan [30 menit] - Pengembalian: 30 menit data tekanan darah size = " + originHalfHourDataList.halfHourBps.size
+//                        )
+//                        Log.d("COBA TEST DI 80","Data kesehatan [30 menit] - kembali: 30 menit data latihan size = " + originHalfHourDataList.halfHourSportDatas.size)
+//
+                    }
+
+                    override fun onOriginHRVOriginListDataChange(originHrvDataList: List<HRVOriginData>) {
+                        val hrvOriginData = originHrvDataList[0]
+                        val rate = hrvOriginData.getRate()
+                        Toast.makeText(this@TestingFeature, "ERRORRRRR", Toast.LENGTH_SHORT).show()
+                        Log.d("COBA TEST DI 80", rate)
+                    }
+
+                    override fun onOriginSpo2OriginListDataChange(originSpo2hDataList: List<Spo2hOriginData>) {}
+                    override fun onReadOriginProgress(progress: Float) {
+                        val message =
+                            "onReadOriginProgress Data kesehatan [5 menit] - Kemajuan membaca:$progress"
+//                        Log.d("COBA TEST DI 80", message)
+                    }
+
+                    override fun onReadOriginProgressDetail(
+                        day: Int,
+                        date: String,
+                        allPackage: Int,
+                        currentPackage: Int
+                    ) {
+                        val message =
+                            "onReadOriginProgressDetail Data kesehatan [5 menit] - Kemajuan membaca:currentPackage=$currentPackage,allPackage=$allPackage,dates=$date,day=$day"
+//                        Log.d("COBA TEST DI 80", message)
+                    }
+
+                    override fun onReadOriginComplete() {
+                        val message = "Data kesehatan - akhir bacaan"
+                        Log.d("COBA TEST DI 80", message)
+                    }
+                }
+                val protype = 3
+                if (protype == 3) {
+                    originDataListener = originData3Listener
+                }
+                VPOperateManager.getMangerInstance(mContext)
+                    .readOriginData(writeResponse, originDataListener, 3)
+            }
             87 -> {
                 smartWViewModel.readSportModelOrigin()
                 smartWViewModel.progressSportMode.observe(this) {
@@ -881,7 +1169,6 @@ class TestingFeature : AppCompatActivity() {
 
 
     companion object {
-        private val TAG = TestingFeature::class.java.simpleName
-
+        private val TAG = "TES"
     }
 }
